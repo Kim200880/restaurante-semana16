@@ -1,0 +1,9 @@
+[
+    {
+        "codigo": "Y001",
+        "nombre": "PIZZA",
+        "categoria": "COMIDA RAPIDA",
+        "precio": 3.0,
+        "stock": 18
+    }
+]
