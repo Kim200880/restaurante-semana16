@@ -60,3 +60,20 @@ class ArchivoServicio:
                 continue
 
         return usuarios
+
+    def guardar_productos(self, productos: list[Producto]) -> None:
+        datos = [
+            producto.a_diccionario()
+            for producto in productos
+        ]
+
+        contenido = json.dumps(
+            datos,
+            ensure_ascii=False,
+            indent=4
+        )
+
+        self.archivo_productos.write_text(
+            contenido,
+            encoding="utf-8"
+        )
