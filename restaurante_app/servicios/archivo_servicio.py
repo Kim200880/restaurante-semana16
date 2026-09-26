@@ -3,20 +3,22 @@ from pathlib import Path
 
 from modelos.producto import Producto
 from modelos.usuario import Usuario
+from modelos.venta import Venta
 
 
 class ArchivoServicio:
     def __init__(self):
         carpeta_proyecto = Path(__file__).resolve().parent.parent
         self.carpeta_datos = carpeta_proyecto / "datos"
-
         self.carpeta_datos.mkdir(exist_ok=True)
 
         self.archivo_productos = self.carpeta_datos / "productos.json"
         self.archivo_usuarios = self.carpeta_datos / "usuarios.json"
+        self.archivo_ventas = self.carpeta_datos / "ventas.json"
 
         self._crear_archivo_si_no_existe(self.archivo_productos)
         self._crear_archivo_si_no_existe(self.archivo_usuarios)
+        self._crear_archivo_si_no_existe(self.archivo_ventas)
 
     def _crear_archivo_si_no_existe(self, ruta: Path) -> None:
         if not ruta.exists():
@@ -61,6 +63,19 @@ class ArchivoServicio:
 
         return usuarios
 
+    def cargar_ventas(self) -> list[Venta]:
+        datos = self._leer_json(self.archivo_ventas)
+        ventas = []
+
+        for elemento in datos:
+            try:
+                venta = Venta.desde_diccionario(elemento)
+                ventas.append(venta)
+            except (KeyError, TypeError, ValueError):
+                continue
+
+        return ventas
+
     def guardar_productos(self, productos: list[Producto]) -> None:
         datos = [
             producto.a_diccionario()
@@ -74,6 +89,23 @@ class ArchivoServicio:
         )
 
         self.archivo_productos.write_text(
+            contenido,
+            encoding="utf-8"
+        )
+
+    def guardar_ventas(self, ventas: list[Venta]) -> None:
+        datos = [
+            venta.a_diccionario()
+            for venta in ventas
+        ]
+
+        contenido = json.dumps(
+            datos,
+            ensure_ascii=False,
+            indent=4
+        )
+
+        self.archivo_ventas.write_text(
             contenido,
             encoding="utf-8"
         )

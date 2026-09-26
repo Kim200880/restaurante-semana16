@@ -1,5 +1,8 @@
+from datetime import datetime
+
 from modelos.producto import Producto
 from modelos.usuario import Usuario
+from modelos.venta import Venta
 from servicios.archivo_servicio import ArchivoServicio
 
 
@@ -8,12 +11,14 @@ class RestauranteServicio:
         self.archivo_servicio = archivo_servicio
         self._productos: list[Producto] = []
         self._usuarios: list[Usuario] = []
+        self._ventas: list[Venta] = []
 
         self.cargar_datos()
 
     def cargar_datos(self) -> None:
         self._productos = self.archivo_servicio.cargar_productos()
         self._usuarios = self.archivo_servicio.cargar_usuarios()
+        self._ventas = self.archivo_servicio.cargar_ventas()
 
     def validar_acceso(
         self,
@@ -37,6 +42,9 @@ class RestauranteServicio:
 
     def listar_usuarios(self) -> list[Usuario]:
         return self._usuarios.copy()
+
+    def listar_ventas(self) -> list[Venta]:
+        return self._ventas.copy()
 
     def cantidad_productos(self) -> int:
         return len(self._productos)
@@ -147,3 +155,40 @@ class RestauranteServicio:
 
         self._productos.remove(producto)
         self.archivo_servicio.guardar_productos(self._productos)
+
+    def registrar_venta(
+        self,
+        identificacion_usuario: str,
+        codigo_producto: str
+    ) -> Venta:
+        identificacion_usuario = identificacion_usuario.strip()
+        codigo_producto = codigo_producto.strip()
+
+        usuario = next(
+            (
+                item for item in self._usuarios
+                if item.identificacion == identificacion_usuario
+            ),
+            None
+        )
+
+        if usuario is None:
+            raise ValueError("Seleccione un usuario registrado.")
+
+        producto = self.buscar_producto(codigo_producto)
+
+        if producto is None:
+            raise ValueError("Seleccione un producto registrado.")
+
+        fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        venta = Venta(
+            usuario.identificacion,
+            producto.codigo,
+            fecha
+        )
+
+        ventas_actualizadas = self._ventas + [venta]
+        self.archivo_servicio.guardar_ventas(ventas_actualizadas)
+        self._ventas = ventas_actualizadas
+
+        return venta

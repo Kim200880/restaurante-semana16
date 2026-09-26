@@ -1,118 +1,65 @@
-# Restaurante Inti - Semana 14
+# Restaurante Inti - Semana 15
 
 ## Descripción
 
-Este proyecto corresponde a la Semana 14 de Programación Orientada a Objetos. La aplicación permite gestionar los productos del Restaurante Inti mediante una interfaz gráfica desarrollada con Tkinter, aplicando componentes, contenedores y gestores de geometría.
-
-El sistema conserva una arquitectura modular que separa los modelos, servicios, datos e interfaz gráfica. También mantiene la persistencia de la información mediante archivos JSON.
+Aplicación de escritorio desarrollada en Python y Tkinter para gestionar productos, consultar usuarios y registrar ventas del Restaurante Inti. La información se conserva en archivos JSON.
 
 ## Funcionalidades
 
-La aplicación incluye las siguientes funciones:
-
-- Inicio de sesión mediante identificación y contraseña.
-- Panel principal con la cantidad de productos y usuarios.
-- Consulta de usuarios registrados.
-- Registro de nuevos productos.
-- Consulta de productos mediante su código.
-- Actualización de productos.
-- Eliminación de productos.
-- Visualización de productos en una tabla.
-- Almacenamiento permanente en productos.json.
-- Cierre de sesión.
+- Inicio y cierre de sesión.
+- Registro, consulta, actualización y eliminación de productos.
+- Visualización de productos y usuarios.
+- Registro de ventas seleccionando un usuario y un producto existentes.
+- Visualización de ventas en una tabla.
+- Actualización del stock al realizar una venta.
+- Logo e icono visibles en la interfaz.
+- Persistencia de productos, usuarios y ventas en archivos JSON.
 
 ## Estructura del proyecto
 
-    restaurante_app/
-    ├── datos/
-    │   ├── productos.json
-    │   └── usuarios.json
-    ├── modelos/
-    │   ├── __init__.py
-    │   ├── producto.py
-    │   └── usuario.py
-    ├── servicios/
-    │   ├── __init__.py
-    │   ├── archivo_servicio.py
-    │   └── restaurante_servicio.py
-    ├── ui/
-    │   ├── __init__.py
-    │   ├── login_view.py
-    │   └── main_view.py
-    └── main.py
+```text
+restaurante_app/
+├── assets/
+│   ├── logo.png
+│   └── icono_venta.png
+├── datos/
+│   ├── productos.json
+│   ├── usuarios.json
+│   └── ventas.json
+├── modelos/
+│   ├── producto.py
+│   ├── usuario.py
+│   └── venta.py
+├── servicios/
+│   ├── archivo_servicio.py
+│   └── restaurante_servicio.py
+├── ui/
+│   ├── login_view.py
+│   └── main_view.py
+├── main.py
+└── README.md
+```
 
-## Componentes y contenedores utilizados
+## Organización
 
-Para construir la interfaz se utilizaron los siguientes componentes de Tkinter y ttk:
+Los modelos representan los productos, usuarios y ventas. `ArchivoServicio` lee y guarda los archivos JSON. `RestauranteServicio` contiene las operaciones y validaciones. Las vistas de `ui` muestran la interfaz y llaman al servicio mediante los botones.
 
-- Tk: ventana principal.
-- Frame: organización de las secciones.
-- LabelFrame: agrupación del formulario y de la tabla.
-- Label: presentación de títulos y textos.
-- Entry: ingreso de datos.
-- Button: ejecución de operaciones mediante command.
-- Notebook: navegación mediante pestañas.
-- Treeview: presentación organizada de productos.
-- Scrollbar: desplazamiento vertical.
-- Text: presentación de los usuarios registrados.
-- Messagebox: mensajes de confirmación, advertencia y error.
+## Interfaz gráfica
 
-Los componentes se distribuyeron mediante los gestores de geometría pack y grid.
-
-## Mejoras realizadas
-
-Durante la Semana 14 se mejoró la organización visual de la aplicación mediante un encabezado, un panel principal y pestañas para productos y usuarios.
-
-La sección de productos incorpora un formulario con los campos código, nombre, categoría, precio y stock. También contiene botones de acción y una tabla que se actualiza después de realizar cada operación.
-
-La interfaz solicita las operaciones a RestauranteServicio y no manipula directamente los archivos JSON. Las validaciones y reglas del sistema permanecen dentro de los modelos y servicios.
-
-## Gestión de productos
-
-La aplicación permite realizar las siguientes operaciones:
-
-1. Registrar un producto nuevo.
-2. Consultar un producto mediante su código.
-3. Actualizar los datos de un producto existente.
-4. Eliminar un producto.
-5. Visualizar todos los productos registrados.
-6. Limpiar los campos del formulario.
-
-## Persistencia
-
-Los productos se almacenan en el archivo datos/productos.json. Las operaciones de lectura y escritura se realizan mediante ArchivoServicio.
-
-Gracias a esta persistencia, los cambios permanecen disponibles después de cerrar y volver a ejecutar la aplicación.
-
-## Separación de responsabilidades
-
-- Los modelos representan los productos y usuarios.
-- ArchivoServicio se encarga de leer y guardar los archivos JSON.
-- RestauranteServicio contiene las validaciones y operaciones del sistema.
-- LoginView administra la interfaz de inicio de sesión.
-- MainView organiza el panel principal, los formularios y las tablas.
-- main.py inicia la aplicación y conecta sus componentes.
-
-## Validaciones
-
-El sistema verifica:
-
-- Campos obligatorios.
-- Código de producto no repetido.
-- Precio numérico y no negativo.
-- Stock entero y no negativo.
-- Existencia del producto antes de actualizarlo o eliminarlo.
-- Identificación y contraseña para permitir el acceso.
+La aplicación utiliza componentes de Tkinter y ttk como `Frame`, `Label`, `Entry`, `Button`, `Combobox`, `Notebook` y `Treeview`. La pestaña Ventas permite seleccionar un usuario y un producto para registrar la venta y consultar el historial.
 
 ## Ejecución
 
-1. Tener Python instalado.
-2. Abrir el proyecto en Visual Studio Code.
-3. Abrir la carpeta restaurante_app.
-4. Ejecutar el archivo main.py.
-5. Ingresar una identificación y contraseña registradas en usuarios.json.
-6. Utilizar las pestañas para gestionar productos o consultar usuarios.
+1. Instalar Python.
+2. Abrir la carpeta `restaurante_app` en Visual Studio Code.
+3. Ejecutar desde la terminal:
 
-La aplicación también puede ejecutarse desde la terminal con el comando:
+```bash
+python main.py
+```
 
-    python main.py
+4. Iniciar sesión con un usuario registrado en `datos/usuarios.json`.
+
+## Persistencia
+
+Los datos se guardan en `datos/productos.json`, `datos/usuarios.json` y `datos/ventas.json`, por lo que permanecen disponibles después de cerrar la aplicación.

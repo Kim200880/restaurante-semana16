@@ -1,16 +1,9 @@
 [
     {
-        "codigo": "Y001",
-        "nombre": "PIZZA",
-        "categoria": "COMIDA RAPIDA",
-        "precio": 3.0,
-        "stock": 18
-    },
-    {
         "codigo": "K001",
-        "nombre": "Jugo natural",
-        "categoria": "Bebidas",
-        "precio": 1.5,
+        "nombre": "ALMUERZO",
+        "categoria": "COMIDA",
+        "precio": 3.0,
         "stock": 15
     }
 ]
