@@ -52,6 +52,8 @@ class RestauranteServicio:
     def cantidad_usuarios(self) -> int:
         return len(self._usuarios)
 
+    # Gestión de productos
+
     def buscar_producto(self, codigo: str) -> Producto | None:
         codigo = codigo.strip()
 
@@ -70,23 +72,17 @@ class RestauranteServicio:
         stock
     ) -> Producto:
         if self.buscar_producto(codigo):
-            raise ValueError(
-                "Ya existe un producto con ese código."
-            )
+            raise ValueError("Ya existe un producto con ese código.")
 
         try:
             precio_convertido = float(precio)
         except (TypeError, ValueError):
-            raise ValueError(
-                "El precio debe ser un número válido."
-            )
+            raise ValueError("El precio debe ser un número válido.")
 
         try:
             stock_convertido = int(stock)
         except (TypeError, ValueError):
-            raise ValueError(
-                "El stock debe ser un número entero."
-            )
+            raise ValueError("El stock debe ser un número entero.")
 
         producto = Producto(
             codigo,
@@ -119,16 +115,12 @@ class RestauranteServicio:
         try:
             precio_convertido = float(precio)
         except (TypeError, ValueError):
-            raise ValueError(
-                "El precio debe ser un número válido."
-            )
+            raise ValueError("El precio debe ser un número válido.")
 
         try:
             stock_convertido = int(stock)
         except (TypeError, ValueError):
-            raise ValueError(
-                "El stock debe ser un número entero."
-            )
+            raise ValueError("El stock debe ser un número entero.")
 
         producto_actualizado = Producto(
             codigo,
@@ -156,6 +148,8 @@ class RestauranteServicio:
         self._productos.remove(producto)
         self.archivo_servicio.guardar_productos(self._productos)
 
+    # Gestión de ventas
+
     def registrar_venta(
         self,
         identificacion_usuario: str,
@@ -164,13 +158,7 @@ class RestauranteServicio:
         identificacion_usuario = identificacion_usuario.strip()
         codigo_producto = codigo_producto.strip()
 
-        usuario = next(
-            (
-                item for item in self._usuarios
-                if item.identificacion == identificacion_usuario
-            ),
-            None
-        )
+        usuario = self.buscar_usuario(identificacion_usuario)
 
         if usuario is None:
             raise ValueError("Seleccione un usuario registrado.")
@@ -181,6 +169,7 @@ class RestauranteServicio:
             raise ValueError("Seleccione un producto registrado.")
 
         fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         venta = Venta(
             usuario.identificacion,
             producto.codigo,
@@ -192,3 +181,164 @@ class RestauranteServicio:
         self._ventas = ventas_actualizadas
 
         return venta
+
+    # Gestión de usuarios
+
+    def buscar_usuario(self, identificacion: str) -> Usuario | None:
+        identificacion = identificacion.strip()
+
+        for usuario in self._usuarios:
+            if usuario.identificacion == identificacion:
+                return usuario
+
+        return None
+
+    def _validar_administrador(self, administrador: Usuario) -> None:
+        usuario_registrado = self.buscar_usuario(
+            administrador.identificacion
+        )
+
+        if (
+            usuario_registrado is not administrador
+            or usuario_registrado.rol != "Administrador"
+        ):
+            raise ValueError(
+                "Solo el administrador puede gestionar usuarios."
+            )
+
+    def _validar_datos_usuario(
+        self,
+        identificacion: str,
+        nombre: str,
+        correo: str,
+        contrasena: str,
+        rol: str
+    ) -> Usuario:
+        if rol not in ("Empleado", "Cliente"):
+            raise ValueError(
+                "Solo puede gestionar usuarios Empleado o Cliente."
+            )
+
+        usuario = Usuario(
+            identificacion,
+            nombre,
+            correo,
+            contrasena,
+            rol
+        )
+
+        partes_correo = usuario.correo.split("@")
+
+        if (
+            len(partes_correo) != 2
+            or not partes_correo[0]
+            or "." not in partes_correo[1]
+            or partes_correo[1].startswith(".")
+            or partes_correo[1].endswith(".")
+            or any(caracter.isspace() for caracter in usuario.correo)
+        ):
+            raise ValueError("Ingrese un correo válido.")
+
+        return usuario
+
+    def registrar_usuario(
+        self,
+        administrador: Usuario,
+        identificacion: str,
+        nombre: str,
+        correo: str,
+        contrasena: str,
+        rol: str
+    ) -> Usuario:
+        self._validar_administrador(administrador)
+
+        if self.buscar_usuario(identificacion):
+            raise ValueError(
+                "Ya existe un usuario con esa identificación."
+            )
+
+        usuario = self._validar_datos_usuario(
+            identificacion,
+            nombre,
+            correo,
+            contrasena,
+            rol
+        )
+
+        usuarios_actualizados = self._usuarios + [usuario]
+        self.archivo_servicio.guardar_usuarios(usuarios_actualizados)
+        self._usuarios = usuarios_actualizados
+
+        return usuario
+
+    def actualizar_usuario(
+        self,
+        administrador: Usuario,
+        identificacion: str,
+        nombre: str,
+        correo: str,
+        contrasena: str,
+        rol: str
+    ) -> Usuario:
+        self._validar_administrador(administrador)
+
+        usuario_actual = self.buscar_usuario(identificacion)
+
+        if usuario_actual is None:
+            raise ValueError(
+                "No se encontró el usuario seleccionado."
+            )
+
+        if usuario_actual.rol == "Administrador":
+            raise ValueError(
+                "La cuenta del administrador no se modifica "
+                "desde esta sección."
+            )
+
+        # Una contraseña vacía conserva la contraseña actual.
+        if not contrasena.strip():
+            contrasena = usuario_actual.contrasena
+
+        usuario_actualizado = self._validar_datos_usuario(
+            usuario_actual.identificacion,
+            nombre,
+            correo,
+            contrasena,
+            rol
+        )
+
+        usuarios_actualizados = self._usuarios.copy()
+        posicion = usuarios_actualizados.index(usuario_actual)
+        usuarios_actualizados[posicion] = usuario_actualizado
+
+        self.archivo_servicio.guardar_usuarios(usuarios_actualizados)
+        self._usuarios = usuarios_actualizados
+
+        return usuario_actualizado
+
+    def eliminar_usuario(
+        self,
+        administrador: Usuario,
+        identificacion: str
+    ) -> None:
+        self._validar_administrador(administrador)
+
+        usuario = self.buscar_usuario(identificacion)
+
+        if usuario is None:
+            raise ValueError(
+                "No se encontró el usuario seleccionado."
+            )
+
+        if usuario.rol == "Administrador":
+            raise ValueError(
+                "No puede eliminar la cuenta del administrador."
+            )
+
+        usuarios_actualizados = [
+            item for item in self._usuarios
+            if item.identificacion != usuario.identificacion
+        ]
+
+        self.archivo_servicio.guardar_usuarios(usuarios_actualizados)
+        self._usuarios = usuarios_actualizados

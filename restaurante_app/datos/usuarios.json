@@ -3,6 +3,14 @@
         "identificacion": "2250069502",
         "nombre": "Kimberly Barrigas",
         "correo": "abigail54@gmail.com",
-        "contrasena": "1234"
+        "contrasena": "1234",
+        "rol": "Administrador"
+    },
+    {
+        "identificacion": "Y001",
+        "nombre": "Yineth",
+        "correo": "yineth@example.com",
+        "contrasena": "1234",
+        "rol": "Empleado"
     }
 ]

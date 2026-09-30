@@ -93,6 +93,23 @@ class ArchivoServicio:
             encoding="utf-8"
         )
 
+    def guardar_usuarios(self, usuarios: list[Usuario]) -> None:
+        datos = [
+            usuario.a_diccionario()
+            for usuario in usuarios
+        ]
+
+        contenido = json.dumps(
+            datos,
+            ensure_ascii=False,
+            indent=4
+        )
+
+        self.archivo_usuarios.write_text(
+            contenido,
+            encoding="utf-8"
+        )
+
     def guardar_ventas(self, ventas: list[Venta]) -> None:
         datos = [
             venta.a_diccionario()
